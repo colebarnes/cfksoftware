@@ -19,22 +19,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.cfksoftware.crypto;
+package org.cfksoftware.common;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+public class CfkException extends Exception {
+  private static final long serialVersionUID = -7581328866615192441L;
 
-import org.junit.jupiter.api.Test;
+  public static final long ERROR_UNKNOWN = Long.MIN_VALUE;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest {
+  private long code = CfkException.ERROR_UNKNOWN;
 
-  /**
-   * Rigorous Test :-)
-   */
-  @Test
-  public void shouldAnswerWithTrue() {
-    assertTrue(true);
+  public CfkException(long code, String message) {
+    super(message);
+    this.code = code;
+  }
+
+  public CfkException(long code, String message, Throwable cause) {
+    super(message, cause);
+    this.code = code;
+  }
+
+  public long getCode() {
+    return this.code;
+  }
+
+  @Override
+  public String getMessage() {
+    return String.format("[%d]: %s", this.code, super.getMessage());
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s: %s", this.getClass().getCanonicalName(), this.getMessage());
   }
 }

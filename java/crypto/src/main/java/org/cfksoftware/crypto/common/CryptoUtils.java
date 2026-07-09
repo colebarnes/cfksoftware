@@ -1,0 +1,116 @@
+/*
+ * Copyright © 2026 cfksoftware@proton.me, https://cfksoftware.org
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the “Software”), to deal in
+ * the Software without restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+ * Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR  COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+package org.cfksoftware.crypto.common;
+
+import java.security.Provider;
+import java.security.Provider.Service;
+import java.security.Security;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider;
+import org.cfksoftware.common.logging.CfkLogger;
+
+public class CryptoUtils {
+  static {
+    CryptoUtils.getBouncyCastleProvider();
+    CryptoUtils.getBouncyCastlePqcProvider();
+  }
+
+  public static Map<String, Set<String>> getProviderInfo(Provider provider) {
+    if (provider == null) {
+      return null;
+    } else {
+      Map<String, Set<String>> providerInfo = new TreeMap<>();
+
+      for (Service service : provider.getServices()) {
+        if (service != null) {
+          String serviceType = service.getType();
+          String serviceAlgorithm = service.getAlgorithm();
+          Set<String> algorithms = providerInfo.get(serviceType);
+          
+          if(algorithms==null) {
+            algorithms = new TreeSet<>();
+            providerInfo.put(serviceType, algorithms);
+          }
+          
+          algorithms.add(serviceAlgorithm);
+        }
+      }
+
+      return providerInfo;
+    }
+  }
+
+  public static void printProviderInfo(Provider provider) {
+    if (provider == null) {
+      CfkLogger.warn("No provider provided...");
+    } else {
+      CfkLogger.info("################################################################################");
+      CfkLogger.info("Provider: %s %s", provider.getName(), provider.getVersionStr());
+
+      Map<String, Set<String>> providerInfo = CryptoUtils.getProviderInfo(provider);
+      if (providerInfo != null) {
+        for(String serviceType:providerInfo.keySet()) {
+          CfkLogger.info("    %s: ", serviceType);
+          
+          for(String serviceAlgorithm:providerInfo.get(serviceType)) {
+            CfkLogger.info("        %s", serviceAlgorithm);
+          }
+        }
+      }
+
+      CfkLogger.info("################################################################################");
+    }
+  }
+
+  public static void printProviderInfos() {
+    for (Provider provider : Security.getProviders()) {
+      CryptoUtils.printProviderInfo(provider);
+    }
+  }
+
+  public static Provider getBouncyCastleProvider() {
+    Provider provider = Security.getProvider("BC");
+
+    if (provider == null) {
+      provider = new BouncyCastleProvider();
+      Security.addProvider(provider);
+    }
+
+    return provider;
+  }
+
+  public static Provider getBouncyCastlePqcProvider() {
+    Provider provider = Security.getProvider("BCPQC");
+
+    if (provider == null) {
+      provider = new BouncyCastlePQCProvider();
+      Security.addProvider(provider);
+    }
+
+    return provider;
+  }
+}

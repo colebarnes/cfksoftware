@@ -19,22 +19,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.cfksoftware.crypto;
+package org.cfksoftware.common;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-import org.junit.jupiter.api.Test;
+public class StringUtils {
+  public static String fromBytes(byte[] data) {
+    return StringUtils.fromBytes(data, StringUtils.defaultCharset());
+  }
 
-/**
- * Unit test for simple App.
- */
-public class AppTest {
+  public static String fromBytes(byte[] data, Charset charset) {
+    // TODO: check inputs
+    return new String(data, charset);
+  }
 
-  /**
-   * Rigorous Test :-)
-   */
-  @Test
-  public void shouldAnswerWithTrue() {
-    assertTrue(true);
+  public static byte[] toBytes(String str) {
+    return StringUtils.toBytes(str, StringUtils.defaultCharset());
+  }
+
+  public static byte[] toBytes(String str, Charset charset) {
+    // TODO: check inputs
+    return str.getBytes(charset);
+  }
+
+  public static boolean isNullOrBlank(String str) {
+    return str == null || str.isBlank();
+  }
+
+  public static Charset defaultCharset() {
+    return StandardCharsets.UTF_8;
   }
 }

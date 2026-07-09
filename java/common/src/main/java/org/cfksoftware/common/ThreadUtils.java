@@ -19,22 +19,45 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.cfksoftware.crypto;
+package org.cfksoftware.common;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+public class ThreadUtils {
+  public static long threadId() {
+    return Thread.currentThread().threadId();
+  }
 
-import org.junit.jupiter.api.Test;
+  public static String getCallerInfoString(int level, boolean includeFileName, boolean includeLineNum) {
+    StringBuffer callerInfo = new StringBuffer("caller.unknown");
+    StackTraceElement element = ThreadUtils.getCaller(level);
 
-/**
- * Unit test for simple App.
- */
-public class AppTest {
+    if (element != null) {
+      callerInfo.delete(0, callerInfo.length());
+      callerInfo.append(element.getClassName());
+      callerInfo.append('.');
+      callerInfo.append(element.getMethodName());
 
-  /**
-   * Rigorous Test :-)
-   */
-  @Test
-  public void shouldAnswerWithTrue() {
-    assertTrue(true);
+      if (includeFileName) {
+        callerInfo.append(':');
+        callerInfo.append(element.getFileName());
+      }
+
+      if (includeLineNum) {
+        callerInfo.append(':');
+        callerInfo.append(element.getLineNumber());
+      }
+    }
+
+    return callerInfo.toString();
+  }
+
+  public static StackTraceElement getCaller(int level) {
+    StackTraceElement element = null;
+    StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+
+    if (elements != null && elements.length >= level) {
+      element = elements[level];
+    }
+
+    return element;
   }
 }

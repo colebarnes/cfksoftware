@@ -19,22 +19,38 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.cfksoftware.crypto;
+package org.cfksoftware.common;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.junit.jupiter.api.Test;
+import org.cfksoftware.common.logging.CfkLogger;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest {
+public class StreamUtils {
+  public static int DEFAULT_BUFFER_LEN = 1024;
 
-  /**
-   * Rigorous Test :-)
-   */
-  @Test
-  public void shouldAnswerWithTrue() {
-    assertTrue(true);
+  public static long copy(InputStream in, OutputStream out) throws IOException {
+    return StreamUtils.copy(in, out, DEFAULT_BUFFER_LEN);
+  }
+
+  public static long copy(InputStream in, OutputStream out, int bufferLen) throws IOException {
+    CfkLogger.entering();
+    // TODO: check inputs
+
+    byte[] buffer = new byte[bufferLen];
+    int bytesRead = 0;
+    long totalBytesRead = 0;
+
+    while ((bytesRead = in.read(buffer)) >= 0) {
+      if (out != null) {
+        out.write(buffer, 0, bytesRead);
+      }
+
+      totalBytesRead += bytesRead;
+    }
+
+    CfkLogger.exiting(totalBytesRead);
+    return totalBytesRead;
   }
 }

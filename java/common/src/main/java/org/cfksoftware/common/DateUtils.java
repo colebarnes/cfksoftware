@@ -19,22 +19,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.cfksoftware.crypto;
+package org.cfksoftware.common;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import org.junit.jupiter.api.Test;
+public class DateUtils {
+  public static final String ISO_8601 = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
-/**
- * Unit test for simple App.
- */
-public class AppTest {
+  public static Date getCurrentDate() {
+    return new Date();
+  }
 
-  /**
-   * Rigorous Test :-)
-   */
-  @Test
-  public void shouldAnswerWithTrue() {
-    assertTrue(true);
+  public static String formatCurrentDate(String fmt) {
+    return DateUtils.formatDate(DateUtils.getCurrentDate(), fmt);
+  }
+
+  public static String iso8601CurrentDate() {
+    return DateUtils.formatDate(DateUtils.getCurrentDate(), DateUtils.ISO_8601);
+  }
+
+  public static String formatDate(Date date, String fmt) {
+    SimpleDateFormat dtFmt = new SimpleDateFormat(fmt);
+    return dtFmt.format(date);
   }
 }
