@@ -21,10 +21,23 @@
 
 package org.cfksoftware.common;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.cfksoftware.common.logging.CfkLogger;
 
 public class App {
   public static void main(String[] args) {
     CfkLogger.info(App.class.getCanonicalName());
+    
+    Map<String, String> data = new TreeMap<>();
+    data.put("foo", "bar");
+    data.put("Secret Message", "Hello world!!!");
+    data.put("special_chars", "~!@#$%^&*()_+?/|\\`");
+    data.put("blah", null);
+    data.put("blee", "");
+    
+    String destUrl = "https://utils.cfksoftware.com/snoop?format=html";
+    
   }
 }
