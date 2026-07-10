@@ -21,6 +21,8 @@
 
 package org.cfksoftware.common;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -49,5 +51,21 @@ public class StringUtils {
 
   public static Charset defaultCharset() {
     return StandardCharsets.UTF_8;
+  }
+  
+  public static String urlEncode(String str) {
+    if(str==null) {
+      return "";
+    } else {
+      return URLEncoder.encode(str, StringUtils.defaultCharset());
+    }
+  }
+  
+  public static String urlDecode(String str) {
+    if(str==null) {
+      return "";
+    } else {
+      return URLDecoder.decode(str, StringUtils.defaultCharset());
+    }
   }
 }
