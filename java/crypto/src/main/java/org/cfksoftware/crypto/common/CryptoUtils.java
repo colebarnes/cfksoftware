@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
 import org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider;
 import org.cfksoftware.common.logging.CfkLogger;
 
@@ -37,6 +38,7 @@ public class CryptoUtils {
   static {
     CryptoUtils.getBouncyCastleProvider();
     CryptoUtils.getBouncyCastlePqcProvider();
+    CryptoUtils.getBouncyCastleJseeProvider();
   }
 
   public static Map<String, Set<String>> getProviderInfo(Provider provider) {
@@ -112,5 +114,29 @@ public class CryptoUtils {
     }
 
     return provider;
+  }
+
+  public static Provider getBouncyCastleJseeProvider() {
+    Provider provider = Security.getProvider("BCJSSE");
+
+    if (provider == null) {
+      provider = new BouncyCastleJsseProvider();
+      Security.addProvider(provider);
+    }
+
+    return provider;
+  }
+  
+  public static void isolateBouncyCastleProviders() {
+    Set<String> providersToRemove = new TreeSet<String>();
+    for(Provider provider:Security.getProviders()) {
+      if(!provider.getName().startsWith("BC")) {
+        providersToRemove.add(provider.getName());
+      }
+    }
+    
+    for(String providerName:providersToRemove) {
+      Security.removeProvider(providerName);
+    }
   }
 }

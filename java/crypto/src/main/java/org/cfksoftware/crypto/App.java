@@ -22,11 +22,14 @@
 package org.cfksoftware.crypto;
 
 import org.cfksoftware.common.logging.CfkLogger;
-import org.cfksoftware.crypto.common.CryptoUtils;
 
 public class App {
   public static void main(String[] args) {
-    CfkLogger.info(App.class.getCanonicalName());
-    CryptoUtils.printProviderInfos();
+    try {
+      CfkLogger.info(App.class.getCanonicalName());
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }
