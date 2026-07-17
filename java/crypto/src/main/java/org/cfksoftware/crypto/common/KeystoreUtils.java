@@ -35,10 +35,12 @@ import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Set;
 
+import org.cfksoftware.common.DateUtils;
 import org.cfksoftware.common.FileUtils;
 import org.cfksoftware.common.logging.CfkLogger;
 
@@ -191,21 +193,51 @@ public class KeystoreUtils {
 
   public static void printInfo(KeyStore ks, char[] password) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
     if (ks != null) {
-      Enumeration<String> aliases = ks.aliases();
+      CfkLogger.info("************************************************************");
+      CfkLogger.info("* KeyStore Info:");
+      CfkLogger.info("*   %s [s v%s]", ks.getType(), ks.getProvider().getName(), ks.getProvider().getVersionStr());
 
+      Enumeration<String> aliases = ks.aliases();
       while (aliases.hasMoreElements()) {
         String alias = aliases.nextElement();
-        CfkLogger.info("KeyStore Alias: %s", alias);
+        CfkLogger.info("*");
+        CfkLogger.info("*   Alias: %s [%s entry]", alias, ks.isKeyEntry(alias) ? "key" : "cert");
 
-        CfkLogger.info("Certificate Entry: %b", ks.isCertificateEntry(alias));
-        CfkLogger.info("Key Entry: %b", ks.isKeyEntry(alias));
+        Date date = ks.getCreationDate(alias);
+        CfkLogger.info("*     Creation Date: %s", DateUtils.iso8601(date));
 
-        Certificate cert = ks.getCertificate(alias);
         Set<Attribute> attributes = ks.getAttributes(alias);
-        Certificate[] chain = ks.getCertificateChain(alias);
-        Date ksDate = ks.getCreationDate(alias);
-        Key key = ks.getKey(alias, password);
+        if (attributes != null && attributes.size() > 0) {
+          CfkLogger.info("*     Attributes:");
+          for (Attribute attr : attributes) {
+            CfkLogger.info("*       %s = %s", attr.getName(), attr.getValue());
+          }
+        }
+
+        if (ks.isCertificateEntry(alias)) {
+          Certificate cert = ks.getCertificate(alias);
+          CfkLogger.info("*     Cert: %s", cert.toString());
+        } else {
+          Key key = ks.getKey(alias, password);
+          CfkLogger.info("*     %s Key", key.getAlgorithm());
+
+          Certificate[] chain = ks.getCertificateChain(alias);
+          Certificate cert = ks.getCertificate(alias);
+
+          if (chain != null && chain.length > 0) {
+            CfkLogger.info("*     Cert chain:");
+            for (Certificate crt : chain) {
+              CfkLogger.info("*       -> %s:", X509Utils.toStringSimple((X509Certificate) crt));
+            }
+          } else if (cert != null) {
+            // TODO: print cert
+          } else {
+            CfkLogger.info("*     [no cert info found]");
+          }
+        }
       }
+
+      CfkLogger.info("************************************************************");
     }
   }
 }

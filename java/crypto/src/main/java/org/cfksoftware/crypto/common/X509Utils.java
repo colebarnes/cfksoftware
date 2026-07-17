@@ -19,32 +19,32 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.cfksoftware.common;
+package org.cfksoftware.crypto.common;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.security.cert.X509Certificate;
 
-public class DateUtils {
-  public static final String ISO_8601 = "yyyy-MM-dd'T'HH:mm:ssXXX";
+import org.cfksoftware.common.DateUtils;
 
-  public static Date getCurrentDate() {
-    return new Date();
-  }
+public class X509Utils {
+  public static String toStringSimple(X509Certificate cert) {
+    StringBuffer sb = new StringBuffer();
 
-  public static String formatCurrentDate(String fmt) {
-    return DateUtils.formatDate(DateUtils.getCurrentDate(), fmt);
-  }
+    if (cert != null) {
+      sb.append("[subject:] ");
+      sb.append(cert.getSubjectX500Principal().getName());
 
-  public static String iso8601CurrentDate() {
-    return DateUtils.formatDate(DateUtils.getCurrentDate(), DateUtils.ISO_8601);
-  }
+      sb.append("; [serial:] ");
+      sb.append(cert.getSerialNumber());
 
-  public static String iso8601(Date data) {
-    return DateUtils.formatDate(data, DateUtils.ISO_8601);
-  }
+      sb.append("; [issuer:] ");
+      sb.append(cert.getIssuerX500Principal().getName());
 
-  public static String formatDate(Date date, String fmt) {
-    SimpleDateFormat dtFmt = new SimpleDateFormat(fmt);
-    return dtFmt.format(date);
+      sb.append("; [validity:] ");
+      sb.append(DateUtils.iso8601(cert.getNotBefore()));
+      sb.append(" - ");
+      sb.append(DateUtils.iso8601(cert.getNotAfter()));
+    }
+
+    return sb.toString();
   }
 }
