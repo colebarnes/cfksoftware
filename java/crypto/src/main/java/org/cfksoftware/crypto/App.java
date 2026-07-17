@@ -27,7 +27,6 @@ public class App {
   public static void main(String[] args) {
     try {
       CfkLogger.info(App.class.getCanonicalName());
-
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -36,6 +36,10 @@ import org.cfksoftware.common.logging.CfkLogger;
 
 public class CryptoUtils {
   static {
+    CryptoUtils.loadBouncyCastleProviders();
+  }
+
+  public static void loadBouncyCastleProviders() {
     CryptoUtils.getBouncyCastleProvider();
     CryptoUtils.getBouncyCastlePqcProvider();
     CryptoUtils.getBouncyCastleJseeProvider();
@@ -52,12 +56,12 @@ public class CryptoUtils {
           String serviceType = service.getType();
           String serviceAlgorithm = service.getAlgorithm();
           Set<String> algorithms = providerInfo.get(serviceType);
-          
-          if(algorithms==null) {
+
+          if (algorithms == null) {
             algorithms = new TreeSet<>();
             providerInfo.put(serviceType, algorithms);
           }
-          
+
           algorithms.add(serviceAlgorithm);
         }
       }
@@ -75,10 +79,10 @@ public class CryptoUtils {
 
       Map<String, Set<String>> providerInfo = CryptoUtils.getProviderInfo(provider);
       if (providerInfo != null) {
-        for(String serviceType:providerInfo.keySet()) {
+        for (String serviceType : providerInfo.keySet()) {
           CfkLogger.info("    %s: ", serviceType);
-          
-          for(String serviceAlgorithm:providerInfo.get(serviceType)) {
+
+          for (String serviceAlgorithm : providerInfo.get(serviceType)) {
             CfkLogger.info("        %s", serviceAlgorithm);
           }
         }
@@ -126,16 +130,16 @@ public class CryptoUtils {
 
     return provider;
   }
-  
+
   public static void isolateBouncyCastleProviders() {
     Set<String> providersToRemove = new TreeSet<String>();
-    for(Provider provider:Security.getProviders()) {
-      if(!provider.getName().startsWith("BC")) {
+    for (Provider provider : Security.getProviders()) {
+      if (!provider.getName().startsWith("BC")) {
         providersToRemove.add(provider.getName());
       }
     }
-    
-    for(String providerName:providersToRemove) {
+
+    for (String providerName : providersToRemove) {
       Security.removeProvider(providerName);
     }
   }
