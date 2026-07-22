@@ -23,8 +23,10 @@ package org.cfksoftware.crypto.common;
 
 import java.security.Provider;
 import java.security.Provider.Service;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -39,6 +41,24 @@ public class CryptoUtils {
     CryptoUtils.loadBouncyCastleProviders();
   }
 
+  private CryptoUtils() {
+    /* This utility class should not be instantiated */
+  }
+
+  private static final SecureRandom sRand = new SecureRandom();
+
+  public static synchronized byte[] secureRandom(int numBytes) {
+    byte[] bytes = new byte[numBytes];
+    CryptoUtils.secureRandom(bytes);
+    return bytes;
+  }
+
+  public static synchronized void secureRandom(byte[] bytes) {
+    if (bytes != null) {
+      CryptoUtils.sRand.nextBytes(bytes);
+    }
+  }
+
   public static void loadBouncyCastleProviders() {
     CryptoUtils.getBouncyCastleProvider();
     CryptoUtils.getBouncyCastlePqcProvider();
@@ -46,18 +66,18 @@ public class CryptoUtils {
   }
 
   public static Map<String, Set<String>> getProviderInfo(Provider provider) {
-    if (provider == null) {
-      return null;
-    } else {
-      Map<String, Set<String>> providerInfo = new TreeMap<>();
+    Map<String, Set<String>> providerInfo = new TreeMap<>();
 
+    if (provider != null) {
       for (Service service : provider.getServices()) {
         if (service != null) {
           String serviceType = service.getType();
           String serviceAlgorithm = service.getAlgorithm();
-          Set<String> algorithms = providerInfo.get(serviceType);
+          Set<String> algorithms;
 
-          if (algorithms == null) {
+          if (providerInfo.containsKey(serviceType)) {
+            algorithms = providerInfo.get(serviceType);
+          } else {
             algorithms = new TreeSet<>();
             providerInfo.put(serviceType, algorithms);
           }
@@ -65,9 +85,9 @@ public class CryptoUtils {
           algorithms.add(serviceAlgorithm);
         }
       }
-
-      return providerInfo;
     }
+
+    return providerInfo;
   }
 
   public static void printProviderInfo(Provider provider) {
@@ -78,13 +98,12 @@ public class CryptoUtils {
       CfkLogger.info("Provider: %s %s", provider.getName(), provider.getVersionStr());
 
       Map<String, Set<String>> providerInfo = CryptoUtils.getProviderInfo(provider);
-      if (providerInfo != null) {
-        for (String serviceType : providerInfo.keySet()) {
-          CfkLogger.info("    %s: ", serviceType);
+      for (Entry<String, Set<String>> entry : providerInfo.entrySet()) {
+        String serviceType = entry.getKey();
+        CfkLogger.info("    %s: ", serviceType);
 
-          for (String serviceAlgorithm : providerInfo.get(serviceType)) {
-            CfkLogger.info("        %s", serviceAlgorithm);
-          }
+        for (String serviceAlgorithm : entry.getValue()) {
+          CfkLogger.info("        %s", serviceAlgorithm);
         }
       }
 

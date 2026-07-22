@@ -27,6 +27,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class FileUtils {
+  private FileUtils() {
+    /* This utility class should not be instantiated */
+  }
+
   public static byte[] readFile(File file) throws IOException {
     try (FileInputStream in = new FileInputStream(file); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
       StreamUtils.copy(in, out);

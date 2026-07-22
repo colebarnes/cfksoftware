@@ -22,10 +22,14 @@
 package org.cfksoftware.common;
 
 import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Random;
 
 public class ByteUtils {
+  private ByteUtils() {
+    /* This utility class should not be instantiated */
+  }
+
   public static String base64Encode(final byte[] bytes) {
     if (bytes == null) {
       throw new NullPointerException("'bytes' is null.");
@@ -48,8 +52,10 @@ public class ByteUtils {
     return bytes;
   }
 
-  public static void random(byte[] bytes) {
-    new SecureRandom().nextBytes(bytes);
+  private static final Random rand = new Random();
+
+  public static synchronized void random(byte[] bytes) {
+    ByteUtils.rand.nextBytes(bytes);
   }
 
   public static byte[] fromInt(final int n) {

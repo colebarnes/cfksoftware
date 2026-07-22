@@ -26,7 +26,7 @@ public class CfkException extends Exception {
 
   public static final long ERROR_UNKNOWN = Long.MIN_VALUE;
 
-  private long code = CfkException.ERROR_UNKNOWN;
+  private final long code;
 
   public CfkException() {
     super();

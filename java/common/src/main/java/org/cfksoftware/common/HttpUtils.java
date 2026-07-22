@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -34,6 +33,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class HttpUtils {
+  private HttpUtils() {
+    /* This utility class should not be instantiated */
+  }
+
   public static String urlEncode(Map<String, String> data) {
     StringBuilder sb = new StringBuilder();
 
@@ -42,7 +45,7 @@ public class HttpUtils {
         String key = entry.getKey();
         String value = entry.getValue();
 
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
           sb.append("&");
         }
 
@@ -71,24 +74,24 @@ public class HttpUtils {
     return data;
   }
 
-  public static String doHttpRequest(String destUrl) throws MalformedURLException, IOException {
+  public static String doHttpRequest(String destUrl) throws IOException {
     return HttpUtils.doHttpRequest(destUrl, null);
   }
 
-  public static String doHttpRequest(String destUrl, Map<String, String> postData) throws MalformedURLException, IOException {
+  public static String doHttpRequest(String destUrl, Map<String, String> postData) throws IOException {
     byte[] responseData = HttpUtils.doGetOrPost(destUrl, postData);
     return StringUtils.fromBytes(responseData);
   }
-  
-  public static byte[] doGet(String destUrl) throws MalformedURLException, IOException {
+
+  public static byte[] doGet(String destUrl) throws IOException {
     return HttpUtils.doGetOrPost(destUrl, null);
   }
 
-  public static byte[] doPost(String destUrl, Map<String, String> data) throws MalformedURLException, IOException {
+  public static byte[] doPost(String destUrl, Map<String, String> data) throws IOException {
     return HttpUtils.doGetOrPost(destUrl, data);
   }
 
-  private static byte[] doGetOrPost(String destUrl, Map<String, String> data) throws MalformedURLException, IOException {
+  private static byte[] doGetOrPost(String destUrl, Map<String, String> data) throws IOException {
     // TODO: check input
     URL url = URI.create(destUrl).toURL();
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();

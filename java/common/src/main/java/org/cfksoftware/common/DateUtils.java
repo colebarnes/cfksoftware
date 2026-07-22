@@ -27,6 +27,10 @@ import java.util.Date;
 public class DateUtils {
   public static final String ISO_8601 = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
+  private DateUtils() {
+    /* This utility class should not be instantiated */
+  }
+
   public static Date getCurrentDate() {
     return new Date();
   }

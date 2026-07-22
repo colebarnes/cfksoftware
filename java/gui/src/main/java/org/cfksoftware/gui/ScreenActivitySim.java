@@ -25,6 +25,8 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 
+import org.cfksoftware.common.logging.CfkLogger;
+
 public class ScreenActivitySim {
   public static void main(String[] args) {
     int xOffset = 1;
@@ -39,15 +41,15 @@ public class ScreenActivitySim {
         Robot r = new Robot();
 
         r.mouseMove(p2.x, p2.y);
-        System.out.println(p2);
+        CfkLogger.info("%s", p2.toString());
         Thread.sleep(foo);
 
         r.mouseMove(p1.x, p1.y);
-        System.out.println(p1);
+        CfkLogger.info("%s", p1.toString());
         Thread.sleep(sleep);
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      CfkLogger.warn(e);
     }
   }
 }

@@ -34,7 +34,11 @@ import com.github.weisj.darklaf.theme.DarculaTheme;
 import com.github.weisj.darklaf.theme.Theme;
 
 public class GuiUtils {
-  public static final String DEFAULT_TITLE = ".:: org.cfksoftware ::.";
+  private static final String DEFAULT_TITLE = ".:: org.cfksoftware ::.";
+
+  private GuiUtils() {
+    /* This utility class should not be instantiated */
+  }
 
   public static void installDarculaLaf() {
     GuiUtils.installLafTheme(new DarculaTheme());
@@ -90,7 +94,7 @@ public class GuiUtils {
   }
 
   public static File[] promptForFiles(boolean multiselect, Component parent) {
-    return GuiUtils.promptForFiles(multiselect, null, null);
+    return GuiUtils.promptForFiles(multiselect, parent, null);
   }
 
   public static File[] promptForFiles(boolean multiselect, Component parent, File parentDirectory) {
@@ -98,12 +102,14 @@ public class GuiUtils {
     dlg.setDialogTitle(GuiUtils.DEFAULT_TITLE);
     dlg.setFileSelectionMode(JFileChooser.FILES_ONLY);
     dlg.setMultiSelectionEnabled(multiselect);
+    File[] files;
 
-    switch (dlg.showDialog(parent, "Choose File")) {
-    case JFileChooser.APPROVE_OPTION:
-      return dlg.getSelectedFiles();
-    default:
-      return null;
+    if (dlg.showDialog(parent, "Choose File") == JFileChooser.APPROVE_OPTION) {
+      files = dlg.getSelectedFiles();
+    } else {
+      files = new File[0];
     }
+
+    return files;
   }
 }

@@ -46,7 +46,7 @@ public class CfkLogger {
   }
 
   public static void error(String msgFmt, Object... args) {
-    CfkLogger.logger.log(ERROR, msgFmt, args);
+    CfkLogger.logger.log(LV_ERROR, msgFmt, args);
   }
 
   public static void warn(Throwable cause, Object... args) {
@@ -62,28 +62,27 @@ public class CfkLogger {
   }
 
   public static void warn(String msgFmt, Object... args) {
-    CfkLogger.logger.log(WARN, msgFmt, args);
+    CfkLogger.logger.log(LV_WARN, msgFmt, args);
   }
 
   public static void info(String msgFmt, Object... args) {
-    CfkLogger.logger.log(INFO, msgFmt, args);
+    CfkLogger.logger.log(LV_INFO, msgFmt, args);
   }
 
   public static void trace(String msgFmt, Object... args) {
-    CfkLogger.logger.log(TRACE, msgFmt, args);
+    CfkLogger.logger.log(LV_TRACE, msgFmt, args);
   }
 
   public static void entering() {
-    CfkLogger.logger.log(TRACE, ">>> ENTERING %s", ThreadUtils.getCallerInfoString(4, false, false));
+    CfkLogger.logger.log(LV_TRACE, ">>> ENTERING %s", ThreadUtils.getCallerInfoString(4, false, false));
   }
 
   public static void exiting() {
-    CfkLogger.logger.log(TRACE, "<<< EXITING %s", ThreadUtils.getCallerInfoString(4, false, false));
+    CfkLogger.logger.log(LV_TRACE, "<<< EXITING %s", ThreadUtils.getCallerInfoString(4, false, false));
   }
 
   public static void exiting(Object retVal) {
-    CfkLogger.logger.log(TRACE, "<<< EXITING %s: %s", ThreadUtils.getCallerInfoString(4, false, false),
-        (retVal == null) ? "" : retVal.toString());
+    CfkLogger.logger.log(LV_TRACE, "<<< EXITING %s: %s", ThreadUtils.getCallerInfoString(4, false, false), (retVal == null) ? "" : retVal.toString());
   }
 
   public static void setLogLevel(int level) {
@@ -96,40 +95,43 @@ public class CfkLogger {
   }
 
   /* IMPLEMENTATION */
-  public static final int OFF = 0;
-  public static final int ERROR = 1;
-  public static final int WARN = 2;
-  public static final int INFO = 3;
-  public static final int TRACE = 4;
+  public static final int LV_OFF = 0;
+  public static final int LV_ERROR = 1;
+  public static final int LV_WARN = 2;
+  public static final int LV_INFO = 3;
+  public static final int LV_TRACE = 4;
 
   private volatile int level;
   private Collection<PrintStream> printStreams;
 
   private CfkLogger() {
-    this.level = CfkLogger.INFO;
+    this.level = CfkLogger.LV_INFO;
 
     this.printStreams = Collections.synchronizedCollection(new HashSet<PrintStream>());
     this.printStreams.add(System.out);
   }
 
   private String getLevelString(int level) {
-    String levelName = "UNKNOWN";
+    String levelName;
 
     switch (level) {
-    case CfkLogger.OFF:
+    case CfkLogger.LV_OFF:
       levelName = "OFF";
       break;
-    case CfkLogger.ERROR:
+    case CfkLogger.LV_ERROR:
       levelName = "ERR";
       break;
-    case CfkLogger.WARN:
+    case CfkLogger.LV_WARN:
       levelName = "WRN";
       break;
-    case CfkLogger.INFO:
+    case CfkLogger.LV_INFO:
       levelName = "INF";
       break;
-    case CfkLogger.TRACE:
+    case CfkLogger.LV_TRACE:
       levelName = "TRC";
+      break;
+    default:
+      levelName = "UNKNOWN";
       break;
     }
 
@@ -156,7 +158,7 @@ public class CfkLogger {
   }
 
   private synchronized void log(int level, String msgFmt, Object... args) {
-    if (this.level > CfkLogger.OFF && this.level >= level) {
+    if (this.level > CfkLogger.LV_OFF && this.level >= level) {
       synchronized (this.printStreams) {
         Iterator<PrintStream> iter = this.printStreams.iterator();
         while (iter.hasNext()) {

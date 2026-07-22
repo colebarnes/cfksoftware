@@ -23,7 +23,6 @@ package org.cfksoftware.crypto.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Key;
@@ -53,19 +52,23 @@ public class KeystoreUtils {
     CryptoUtils.loadBouncyCastleProviders();
   }
 
-  public static KeyStore openPkcs12(File file, char[] password) throws FileNotFoundException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException {
+  private KeystoreUtils() {
+    /* This utility class should not be instantiated */
+  }
+
+  public static KeyStore openPkcs12(File file, char[] password) throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException {
     return KeystoreUtils.openKeystore(file, password, KeystoreUtils.PKCS12);
   }
 
-  public static KeyStore openJks(File file, char[] password) throws FileNotFoundException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException {
+  public static KeyStore openJks(File file, char[] password) throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException {
     return KeystoreUtils.openKeystore(file, password, KeystoreUtils.JKS);
   }
 
-  public static KeyStore openBcfks(File file, char[] password) throws FileNotFoundException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException {
+  public static KeyStore openBcfks(File file, char[] password) throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException {
     return KeystoreUtils.openKeystore(file, password, KeystoreUtils.BCFKS);
   }
 
-  public static KeyStore openKeystore(File file, char[] password, int keystoreType) throws FileNotFoundException, IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException {
+  public static KeyStore openKeystore(File file, char[] password, int keystoreType) throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException {
     byte[] bytes = FileUtils.readFile(file);
     return openKeystore(bytes, password, keystoreType);
   }
@@ -207,7 +210,7 @@ public class KeystoreUtils {
         CfkLogger.info("*     Creation Date: %s", DateUtils.iso8601(date));
 
         Set<Attribute> attributes = ks.getAttributes(alias);
-        if (attributes != null && attributes.size() > 0) {
+        if (attributes != null && !attributes.isEmpty()) {
           CfkLogger.info("*     Attributes:");
           for (Attribute attr : attributes) {
             CfkLogger.info("*       %s = %s", attr.getName(), attr.getValue());

@@ -22,6 +22,10 @@
 package org.cfksoftware.common;
 
 public class ThreadUtils {
+  private ThreadUtils() {
+    /* This utility class should not be instantiated */
+  }
+
   public static long threadId() {
     return Thread.currentThread().threadId();
   }

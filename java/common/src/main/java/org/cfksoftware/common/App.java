@@ -42,7 +42,7 @@ public class App {
       String response = HttpUtils.doHttpRequest(destUrl, data);
       CfkLogger.info("RESPONSE:%n%s", response);
     } catch (Exception e) {
-      e.printStackTrace();
+      CfkLogger.warn(e);
     }
   }
 }

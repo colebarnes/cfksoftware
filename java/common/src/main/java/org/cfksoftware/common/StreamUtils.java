@@ -28,7 +28,11 @@ import java.io.OutputStream;
 import org.cfksoftware.common.logging.CfkLogger;
 
 public class StreamUtils {
-  public static int DEFAULT_BUFFER_LEN = 1024;
+  private static final int DEFAULT_BUFFER_LEN = 1024;
+
+  private StreamUtils() {
+    /* This utility class should not be instantiated */
+  }
 
   public static long copy(InputStream in, OutputStream out) throws IOException {
     return StreamUtils.copy(in, out, DEFAULT_BUFFER_LEN);

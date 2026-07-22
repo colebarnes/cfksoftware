@@ -21,14 +21,19 @@
 
 package org.cfksoftware.crypto;
 
+import java.security.Provider;
+
 import org.cfksoftware.common.logging.CfkLogger;
+import org.cfksoftware.crypto.common.CryptoUtils;
 
 public class App {
   public static void main(String[] args) {
     try {
       CfkLogger.info(App.class.getCanonicalName());
+      Provider provider = CryptoUtils.getBouncyCastleJseeProvider();
+      CryptoUtils.printProviderInfo(provider);
     } catch (Exception e) {
-      e.printStackTrace();
+      CfkLogger.warn(e);
     }
   }
 }

@@ -26,6 +26,10 @@ import java.security.cert.X509Certificate;
 import org.cfksoftware.common.DateUtils;
 
 public class X509Utils {
+  private X509Utils() {
+    /* This utility class should not be instantiated */
+  }
+
   public static String toStringSimple(X509Certificate cert) {
     StringBuffer sb = new StringBuffer();
 
