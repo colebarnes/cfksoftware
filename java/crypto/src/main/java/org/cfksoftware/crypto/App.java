@@ -21,12 +21,26 @@
 
 package org.cfksoftware.crypto;
 
+import java.security.KeyPair;
+import java.util.Arrays;
+
+import javax.crypto.SecretKey;
+
 import org.cfksoftware.common.logging.CfkLogger;
+import org.cfksoftware.crypto.common.CryptoUtils;
 
 public class App {
   public static void main(String[] args) {
     try {
       CfkLogger.info(App.class.getCanonicalName());
+
+      KeyPair keyPair = CryptoUtils.randomRsaKeyPair(4096);
+      SecretKey secretKey = CryptoUtils.randomAesKey(256);
+      CfkLogger.info("key len = %d", secretKey.getEncoded().length);
+      byte[] keyWrapped = CryptoUtils.wrapKey(secretKey, keyPair.getPublic());
+      SecretKey secretKeyUnwrapped = CryptoUtils.unwrapKey(keyWrapped, "aes", keyPair.getPrivate());
+
+      CfkLogger.info("Keys match: %d", Arrays.compare(secretKey.getEncoded(), secretKeyUnwrapped.getEncoded()));
     } catch (Exception e) {
       CfkLogger.warn(e);
     }
