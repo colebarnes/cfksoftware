@@ -103,7 +103,7 @@ public class CryptoUtils {
 
     if (provider == null) {
       provider = new BouncyCastleProvider();
-      Security.addProvider(provider);
+      Security.insertProviderAt(provider, 0);
     }
 
     return provider;
@@ -114,7 +114,7 @@ public class CryptoUtils {
 
     if (provider == null) {
       provider = new BouncyCastlePQCProvider();
-      Security.addProvider(provider);
+      Security.insertProviderAt(provider, 0);
     }
 
     return provider;
@@ -125,7 +125,7 @@ public class CryptoUtils {
 
     if (provider == null) {
       provider = new BouncyCastleJsseProvider();
-      Security.addProvider(provider);
+      Security.insertProviderAt(provider, 0);
     }
 
     return provider;
