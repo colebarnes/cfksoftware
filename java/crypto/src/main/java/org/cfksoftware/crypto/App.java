@@ -30,17 +30,27 @@ import org.cfksoftware.common.logging.CfkLogger;
 import org.cfksoftware.crypto.common.CryptoUtils;
 
 public class App {
+  private static void testKeyWrapping() throws Exception {
+    KeyPair keyPair = CryptoUtils.randomRsaKeyPair(4096);
+    SecretKey secretKey = CryptoUtils.randomAesKey(256);
+    CfkLogger.info("key len = %d", secretKey.getEncoded().length);
+    byte[] keyWrapped = CryptoUtils.wrapKey(secretKey, keyPair.getPublic());
+    SecretKey secretKeyUnwrapped = CryptoUtils.unwrapKey(keyWrapped, "aes", keyPair.getPrivate());
+    CfkLogger.info("Keys match: %d", Arrays.compare(secretKey.getEncoded(), secretKeyUnwrapped.getEncoded()));
+  }
+
+  private static void testHashing() throws Exception {
+    String str = "Hello world!";
+    CfkLogger.info("String: %s", str);
+    CfkLogger.info("  sha256: %s", Hasher.sha256().hash(str));
+    CfkLogger.info("  sha512: %s", Hasher.sha512().hash(str));
+  }
+
   public static void main(String[] args) {
     try {
       CfkLogger.info(App.class.getCanonicalName());
-
-      KeyPair keyPair = CryptoUtils.randomRsaKeyPair(4096);
-      SecretKey secretKey = CryptoUtils.randomAesKey(256);
-      CfkLogger.info("key len = %d", secretKey.getEncoded().length);
-      byte[] keyWrapped = CryptoUtils.wrapKey(secretKey, keyPair.getPublic());
-      SecretKey secretKeyUnwrapped = CryptoUtils.unwrapKey(keyWrapped, "aes", keyPair.getPrivate());
-
-      CfkLogger.info("Keys match: %d", Arrays.compare(secretKey.getEncoded(), secretKeyUnwrapped.getEncoded()));
+      App.testKeyWrapping();
+      App.testHashing();
     } catch (Exception e) {
       CfkLogger.warn(e);
     }
