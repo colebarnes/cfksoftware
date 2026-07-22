@@ -21,15 +21,34 @@
 
 package org.cfksoftware.crypto.common;
 
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Provider.Service;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
@@ -161,5 +180,71 @@ public class CryptoUtils {
     for (String providerName : providersToRemove) {
       Security.removeProvider(providerName);
     }
+  }
+
+  public static byte[] wrapKey(SecretKey keyToWrap, X509Certificate certReceiver) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+    return CryptoUtils.wrapKey(keyToWrap, certReceiver.getPublicKey());
+  }
+
+  public static byte[] wrapKey(SecretKey keyToWrap, PublicKey keyReceiver) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    Cipher cipher = Cipher.getInstance(keyReceiver.getAlgorithm(), CryptoUtils.getBouncyCastleProvider());
+    cipher.init(Cipher.WRAP_MODE, keyReceiver);
+    return cipher.wrap(keyToWrap);
+  }
+
+  public static SecretKey unwrapKey(byte[] keyWrapped, String keyWrappedAlgorithm, PrivateKey keyReceiver) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+    Cipher cipher = Cipher.getInstance(keyReceiver.getAlgorithm(), CryptoUtils.getBouncyCastleProvider());
+    cipher.init(Cipher.UNWRAP_MODE, keyReceiver);
+    return (SecretKey) cipher.unwrap(keyWrapped, keyWrappedAlgorithm, Cipher.SECRET_KEY);
+  }
+
+  public static SecretKey pbeTwoFishKey(char[] password, byte[] salt, int iterations, int keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    return CryptoUtils.pbeSecretKey(password, salt, iterations, keyLength, "twofish");
+  }
+
+  public static SecretKey pbeSerpentKey(char[] password, byte[] salt, int iterations, int keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    return CryptoUtils.pbeSecretKey(password, salt, iterations, keyLength, "serpent");
+  }
+
+  public static SecretKey pbeAesKey(char[] password, byte[] salt, int iterations, int keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    return CryptoUtils.pbeSecretKey(password, salt, iterations, keyLength, "aes");
+  }
+
+  private static SecretKey pbeSecretKey(char[] password, byte[] salt, int iterations, int keyLength, String keyAlgorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512", CryptoUtils.getBouncyCastleProvider());
+    KeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
+    return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), keyAlgorithm);
+  }
+
+  public static SecretKey randomTwoFishKey(int length) throws NoSuchAlgorithmException {
+    return CryptoUtils.randomSecretKey("twofish", length);
+  }
+
+  public static SecretKey randomSerpentKey(int length) throws NoSuchAlgorithmException {
+    return CryptoUtils.randomSecretKey("serpent", length);
+  }
+
+  public static SecretKey randomAesKey(int length) throws NoSuchAlgorithmException {
+    return CryptoUtils.randomSecretKey("aes", length);
+  }
+
+  private static SecretKey randomSecretKey(String algorithm, int length) throws NoSuchAlgorithmException {
+    KeyGenerator keyGen = KeyGenerator.getInstance(algorithm, CryptoUtils.getBouncyCastleProvider());
+    keyGen.init(length);
+    return keyGen.generateKey();
+  }
+
+  public static KeyPair randomEcKeyPair(int length) throws NoSuchAlgorithmException {
+    return CryptoUtils.randomKeyPair("ec", length);
+  }
+
+  public static KeyPair randomRsaKeyPair(int length) throws NoSuchAlgorithmException {
+    return CryptoUtils.randomKeyPair("rsa", length);
+  }
+
+  private static KeyPair randomKeyPair(String algorithm, int length) throws NoSuchAlgorithmException {
+    KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(algorithm, CryptoUtils.getBouncyCastleProvider());
+    keyPairGen.initialize(length);
+    return keyPairGen.generateKeyPair();
   }
 }
