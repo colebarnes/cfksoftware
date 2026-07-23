@@ -28,6 +28,59 @@ import java.awt.Robot;
 import org.cfksoftware.common.logging.CfkLogger;
 
 public class ScreenActivitySim {
+  // x delta
+  private int xDelta;
+
+  // y delta
+  private int yDelta;
+
+  // time delta for point shift
+  private long shiftDelta;
+
+  // time delta between shift operations
+  private long threadDelta;
+
+  // the thread
+  private Thread th = null;
+
+  // is stopped
+  private boolean isStopped;
+
+  public ScreenActivitySim() {
+    this(1, 0, 0, 60000);
+  }
+
+  public ScreenActivitySim(int xDelta, int yDelta, long shiftDelta, long threadDelta) {
+    this.setXDelta(xDelta);
+    this.setYDelta(yDelta);
+    this.setShiftDelta(shiftDelta);
+    this.setThreadDelta(threadDelta);
+  }
+
+  public void setXDelta(int xDelta) {
+    this.xDelta = xDelta;
+  }
+
+  public void setYDelta(int yDelta) {
+    this.yDelta = yDelta;
+  }
+
+  public void setShiftDelta(long shiftDelta) {
+    this.shiftDelta = shiftDelta;
+  }
+
+  public void setThreadDelta(long threadDelta) {
+    this.threadDelta = threadDelta;
+  }
+
+  public void start() {
+    // TODO: start?
+  }
+
+  public void stop() {
+    // TODO: stop?
+  }
+
   public static void main(String[] args) {
     int xOffset = 1;
     int yOffset = 0;
