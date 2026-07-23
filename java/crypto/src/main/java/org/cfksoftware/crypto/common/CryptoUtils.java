@@ -210,7 +210,7 @@ public class CryptoUtils {
     return CryptoUtils.pbeSecretKey(password, salt, iterations, keyLength, "aes");
   }
 
-  private static SecretKey pbeSecretKey(char[] password, byte[] salt, int iterations, int keyLength, String keyAlgorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {
+  public static SecretKey pbeSecretKey(char[] password, byte[] salt, int iterations, int keyLength, String keyAlgorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {
     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512", CryptoUtils.getBouncyCastleProvider());
     KeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
     return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), keyAlgorithm);
@@ -228,7 +228,7 @@ public class CryptoUtils {
     return CryptoUtils.randomSecretKey("aes", length);
   }
 
-  private static SecretKey randomSecretKey(String algorithm, int length) throws NoSuchAlgorithmException {
+  public static SecretKey randomSecretKey(String algorithm, int length) throws NoSuchAlgorithmException {
     KeyGenerator keyGen = KeyGenerator.getInstance(algorithm, CryptoUtils.getBouncyCastleProvider());
     keyGen.init(length);
     return keyGen.generateKey();

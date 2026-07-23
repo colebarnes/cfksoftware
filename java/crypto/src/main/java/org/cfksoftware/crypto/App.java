@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 
+import org.cfksoftware.common.StringUtils;
 import org.cfksoftware.common.logging.CfkLogger;
 import org.cfksoftware.crypto.common.CryptoUtils;
 
@@ -46,11 +47,25 @@ public class App {
     CfkLogger.info("  sha512: %s", Hasher.sha512().hash(str));
   }
 
+  private static void testEncryption() throws Exception {
+    String str = "This is a super secret message!!!";
+    char[] password = "p@s5w0rd123".toCharArray();
+
+    Encrypter enc = Encrypter.serpent256();
+    byte[] cipherText = enc.encrypt(StringUtils.toBytes(str), password);
+
+    Decrypter dec = Decrypter.getInstance(cipherText);
+    byte[] plainText = dec.decryptToBytes(password);
+
+    CfkLogger.info("Decrypted message: %s", StringUtils.fromBytes(plainText));
+  }
+
   public static void main(String[] args) {
     try {
       CfkLogger.info(App.class.getCanonicalName());
       App.testKeyWrapping();
       App.testHashing();
+      App.testEncryption();
     } catch (Exception e) {
       CfkLogger.warn(e);
     }
